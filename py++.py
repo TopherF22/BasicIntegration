@@ -15,18 +15,17 @@ tickers = sys.argv[1:]
  
 # set time   
 now = dt.datetime.now()
-sixmo = now - dt.timedelta(days=180)
+yearAgo = now - dt.timedelta(days=365)
 
 
 #download data
 try:
-    data = yf.download(tickers, start=sixmo, end=now)['Adj Close']
+    data = yf.download(tickers, start=yearAgo, end=now)['Adj Close']
 except Exception as e:
     print(f"Error retrieving data: {e}")
     sys.exit(1)
 print("Saving data to:", 'data.csv')
 pd.DataFrame(data).to_csv('data.csv')
-
 
 
 
@@ -36,23 +35,20 @@ try:
 except subprocess.CalledProcessError as e:
     print(f"Execution failed: {e}")
     
-results = pd.read_csv('output.csv', header=None, names=['Average'], skiprows=1, dtype={'Average': float})
+results = pd.read_csv('output.csv')
+print(results)
+# # plot
+# plt.figure(figsize=(10, 6))
+# plt.plot(data_df['Date'], data_df['Adj Close'], label='Adj Close')
+# plt.axhline(y=results[0], color='r', linestyle='--', label='Average')
+# plt.title(f'{sys.argv[1]} Price Over Time')
+# plt.xlabel('Date')
+# plt.ylabel('Adj Close')
+# plt.legend()
+# plt.grid(True)
+# plt.show()
 
-results = results['Average'].values.flatten()
-data_df = pd.read_csv('data.csv', parse_dates=['Date'])
-
-# plot
-plt.figure(figsize=(10, 6))
-plt.plot(data_df['Date'], data_df['Adj Close'], label='Adj Close')
-plt.axhline(y=results[0], color='r', linestyle='--', label='Average')
-plt.title('Stock Prices Over Time')
-plt.xlabel('Date')
-plt.ylabel('Adj Close')
-plt.legend()
-plt.grid(True)
-plt.show()
-
-# delete csv
-os.remove('data.csv')
-os.remove('output.csv')
+# # delete csv
+# os.remove('data.csv')
+# os.remove('output.csv')
 
